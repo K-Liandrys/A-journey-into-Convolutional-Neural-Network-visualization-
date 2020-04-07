@@ -47,8 +47,11 @@ def module2traced(module, inputs):
         modules.append(module)
 
     def traverse(module):
+        if isinstance(module, torch.nn.Conv2d):
+            handles.append(module.register_forward_hook(trace))
+            return
         for m in module.children():
-            traverse(m)  # recursion is love
+            traverse(m)
         is_leaf = len(list(module.children())) == 0
         if is_leaf: handles.append(module.register_forward_hook(trace))
 
